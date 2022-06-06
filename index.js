@@ -9,7 +9,7 @@ var strftime = require('strftime');
 // enable CORS (https://en.wikipedia.org/wiki/Cross-origin_resource_sharing)
 // so that your API is remotely testable by FCC 
 var cors = require('cors');
-app.use(cors({optionsSuccessStatus: 200}));  // some legacy browsers choke on 204
+app.use(cors({ optionsSuccessStatus: 200 }));  // some legacy browsers choke on 204
 
 // http://expressjs.com/en/starter/static-files.html
 app.use(express.static('public'));
@@ -21,27 +21,28 @@ app.get("/", function (req, res) {
 
 
 // your first API endpoint... 
-app.get("/api/:date", function (req, res) {
-  // creating a date object
+app.get("/api/:date?", function (req, res) {
+
   var date = new Date();
-  // if the given parameter is a number (timestamp)
-  if(/^\d*$/.test(req.params.date)){
-    date.setTime(req.params.date);
-  } 
-  // else we just create a new date parsing the string given
-  else {
-    date = new Date(req.params.date);
-  }
   
-  // giving headers for JSON
-  res.set({ 'Content-Type': 'application/json' }) 
-  // if the date is invalid
-  if(!date.getTime()) res.send(JSON.stringify({error: "Invalid date given"}))
-  // else, we send the object with two members (unix and natural)
-  else res.send(JSON.stringify({
-    unix: date.getTime(),
-    utc: strftime('%a, %d %b %Y %H:%M:%S GMT', date)
-  }))
+  if (/^\d*$/.test(req.params.date)) {
+    date.setTime(req.params.date);
+  } else if (req.params.date) {
+    date = new Date(req.params.date);
+  } else {
+    date = new Date();
+  }
+
+  console.log()
+
+  if (!date.getTime()) {
+    res.json({ error: "Invalid date given" })
+  } else {
+    res.json({
+      unix: date.getTime(),
+      utc: strftime('%a, %d %b %Y %H:%M:%S GMT', date)
+    });
+  }
 });
 
 
